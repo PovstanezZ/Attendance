@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="180sp"
-        android:fontFamily="@font/raleway_semibold_italic"
+        android:fontFamily="@font/mulish_semibold"
         android:text="Регистрация"
         android:textColor="#ffffff"
         android:textSize="24sp" />
