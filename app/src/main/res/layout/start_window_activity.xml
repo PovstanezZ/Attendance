@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#151515"
+    android:orientation="vertical"
+    tools:context=".StartWindow">
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250sp"
+        android:fontFamily="@font/raleway_semibold_italic"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:text="Добро пожаловать!"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:typeface="normal" />
+
+    <Button
+        android:id="@+id/welcome_auth_button"
+        android:layout_width="250sp"
+        android:layout_height="50sp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20sp"
+        android:backgroundTint="#383838"
+        android:fontFamily="@font/mulish_medium_italic"
+        android:text="Авторизация"
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/welcome_reg_button"
+        android:layout_width="250sp"
+        android:layout_height="50sp"
+        android:layout_gravity="center"
+        android:layout_marginTop="5sp"
+        android:backgroundTint="#383838"
+        android:fontFamily="@font/mulish_medium_italic"
+        android:text="Регистрация"
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
+
+</LinearLayout>
