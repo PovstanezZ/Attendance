@@ -4,6 +4,7 @@
         <item>@font/</item>
         <item>@font/mulish_medium</item>
         <item>@font/mulish_medium_italic</item>
+        <item>@font/raleway_light</item>
         <item>@font/raleway_semibold_italic</item>
     </array>
 </resources>
