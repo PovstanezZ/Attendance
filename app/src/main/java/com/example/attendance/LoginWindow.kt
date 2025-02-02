@@ -11,10 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginWindow : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,15 +27,17 @@ class LoginWindow : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         val userEmail: EditText = findViewById(R.id.auth_email_text)
         val userPass: EditText = findViewById(R.id.auth_pass_text)
         val buttonAuth: Button = findViewById(R.id.button_auth)
-        val login_reg_text: TextView = findViewById(R.id.login_reg_text)
+        val loginRegText: TextView = findViewById(R.id.login_reg_text)
 
-        login_reg_text.setOnClickListener{
-            val intent = Intent (this,RegistrationWindow::class.java)
+        loginRegText.setOnClickListener {
+            val intent = Intent(this, RegistrationWindow::class.java)
             startActivity(intent)
         }
 
@@ -47,9 +51,7 @@ class LoginWindow : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Toast.makeText(this, "Авторизация успешна!", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this, MenuWindow::class.java))
-                            finish()
+                            checkUserRole(email)
                         } else {
                             val errorMessage = task.exception?.message ?: "Ошибка входа"
                             Toast.makeText(this, "Ошибка входа: $errorMessage", Toast.LENGTH_LONG).show()
@@ -57,5 +59,68 @@ class LoginWindow : AppCompatActivity() {
                     }
             }
         }
+    }
+
+    // Проверка роли пользователя по email
+    private fun checkUserRole(email: String) {
+        db.collection("admins").document(email).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // Если в admins есть этот email, назначаем роль admin
+                    updateRoleToAdmin(email)
+                    navigateToAdminMenu()
+                } else {
+                    // Если email не найден в admins, назначаем роль user
+                    updateRoleToUser(email)
+                    navigateToUserMenu()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Ошибка проверки роли", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    // Обновление роли пользователя на 'user' в коллекции users
+    private fun updateRoleToUser(email: String) {
+        val userRef = db.collection("users").document(email)
+
+        // Обновление роли пользователя
+        userRef.update("role", "user")
+            .addOnSuccessListener {
+                Toast.makeText(this, "Роль обновлена на user", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Ошибка при обновлении роли: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+    // Обновление роли пользователя на 'admin' в коллекции users
+    private fun updateRoleToAdmin(email: String) {
+        val userRef = db.collection("users").document(email)
+
+        // Обновление роли пользователя
+        userRef.update("role", "admin")
+            .addOnSuccessListener {
+                Toast.makeText(this, "Роль обновлена до admin", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Ошибка при обновлении роли: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+
+    // Перенаправление на окно администратора
+    private fun navigateToAdminMenu() {
+        Toast.makeText(this, "Добро пожаловать, администратор!", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, AdminMenuWindow::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    // Перенаправление на окно обычного пользователя
+    private fun navigateToUserMenu() {
+        Toast.makeText(this, "Добро пожаловать, пользователь!", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, MenuWindow::class.java)
+        startActivity(intent)
+        finish()
     }
 }

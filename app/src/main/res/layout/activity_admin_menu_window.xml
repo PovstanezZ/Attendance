@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#151515"
+    android:orientation="vertical"
+    tools:context=".LoginWindow">
+
+    <TextView
+        android:id="@+id/ALogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="180sp"
+        android:fontFamily="@font/mulish_semibold"
+        android:text="Меню A"
+        android:textColor="#ffffff"
+        android:textSize="24sp" />
+
+
+    <Button
+        android:id="@+id/Abutton_usp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#383838"
+        android:fontFamily="@font/mulish_medium"
+        android:text="Успеваемость"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        app:cornerRadius="70dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.489" />
+
+    <Button
+        android:id="@+id/Abutton_rasp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#383838"
+        android:fontFamily="@font/mulish_medium"
+        android:text="Расписание"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        app:cornerRadius="70dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.489" />
+
+
+
+</LinearLayout>

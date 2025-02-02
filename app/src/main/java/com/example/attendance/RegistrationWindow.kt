@@ -1,25 +1,19 @@
 package com.example.attendance
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 
 class RegistrationWindow : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,41 +24,73 @@ class RegistrationWindow : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        auth = FirebaseAuth.getInstance()
 
-        //Объявление кнопок
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
+        // Объявление элементов
         val userEmail: EditText = findViewById(R.id.email_text)
         val userPass: EditText = findViewById(R.id.pass_text)
         val buttonReg: Button = findViewById(R.id.button_reg)
-        val login_auth_text: TextView = findViewById(R.id.login_auth_text)
+        val loginAuthText: TextView = findViewById(R.id.login_auth_text)
 
-        //Переход между окнами авторизации
-        login_auth_text.setOnClickListener{
-            val intent = Intent (this,LoginWindow::class.java)
+        // Переход в окно авторизации
+        loginAuthText.setOnClickListener {
+            val intent = Intent(this, LoginWindow::class.java)
             startActivity(intent)
         }
 
-        //Регистрация
+        // Регистрация
         buttonReg.setOnClickListener {
             val email = userEmail.text.toString().trim()
             val pass = userPass.text.toString().trim()
 
             if (email.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Не все поля заполнены, долбаёб >.<", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Заполни все поля!", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
             }
-            else {
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(this, "Регистрация успешна!", Toast.LENGTH_SHORT).show()
-                            val intent = Intent (this,LoginWindow::class.java)
-                            startActivity(intent)
-                        } else {
-                            val errorMessage = task.exception?.message ?: "Неизвестная ошибка"
-                            Toast.makeText(this, "Ошибка регистрации: $errorMessage", Toast.LENGTH_LONG).show()
-                        }
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                        checkAdminRoleAndSaveUser(userId, email)
+                    } else {
+                        val errorMessage = task.exception?.message ?: "Ошибка регистрации"
+                        Toast.makeText(this, "Ошибка: $errorMessage", Toast.LENGTH_LONG).show()
                     }
-            }
+                }
         }
+    }
+
+    // Проверяем, есть ли email в коллекции "admins", и сохраняем пользователя
+    private fun checkAdminRoleAndSaveUser(userId: String, email: String) {
+        db.collection("admins").document(email).get()
+            .addOnSuccessListener { document ->
+                val role = if (document.exists()) "admin" else "user"
+                saveUserToFirestore(userId, email, role)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Ошибка проверки роли", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    // Сохранение данных пользователя в Firestore
+    private fun saveUserToFirestore(userId: String, email: String, role: String) {
+        val user = hashMapOf(
+            "uid" to userId,
+            "email" to email,
+            "role" to role
+        )
+
+        db.collection("users").document(email)
+            .set(user)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Регистрация успешна! Роль: $role", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, LoginWindow::class.java))
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Ошибка сохранения данных: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 }
