@@ -1,16 +1,13 @@
 package com.example.attendance
 
-import android.content.ContentValues.TAG
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 
 class StartWindow : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,17 +20,28 @@ class StartWindow : AppCompatActivity() {
             insets
         }
 
-        val welcome_reg_button: TextView = findViewById(R.id.welcome_reg_button)
-        val welcome_auth_button: TextView = findViewById(R.id.welcome_auth_button)
+        val sharedPreferences: SharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        val userRole = sharedPreferences.getString("role", null)
 
-        welcome_reg_button.setOnClickListener{
-            val intent = Intent (this,RegistrationWindow::class.java)
+        if (userRole == "admin") {
+            startActivity(Intent(this, AdminMenuWindow::class.java))
+            finish()
+        } else if (userRole == "user") {
+            startActivity(Intent(this, MenuWindow::class.java))
+            finish()
+        }
+
+        val welcomeRegButton: TextView = findViewById(R.id.welcome_reg_button)
+        val welcomeAuthButton: TextView = findViewById(R.id.welcome_auth_button)
+
+        welcomeRegButton.setOnClickListener {
+            val intent = Intent(this, RegistrationWindow::class.java)
             startActivity(intent)
         }
-        welcome_auth_button.setOnClickListener{
-            val intent = Intent (this,LoginWindow::class.java)
+
+        welcomeAuthButton.setOnClickListener {
+            val intent = Intent(this, LoginWindow::class.java)
             startActivity(intent)
         }
-
     }
 }

@@ -1,6 +1,7 @@
 package com.example.attendance
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -17,6 +18,7 @@ class LoginWindow : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +32,7 @@ class LoginWindow : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
+        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
 
         val userEmail: EditText = findViewById(R.id.auth_email_text)
         val userPass: EditText = findViewById(R.id.auth_pass_text)
@@ -66,12 +69,12 @@ class LoginWindow : AppCompatActivity() {
         db.collection("admins").document(email).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    // Если в admins есть этот email, назначаем роль admin
                     updateRoleToAdmin(email)
+                    saveUserRole("admin")
                     navigateToAdminMenu()
                 } else {
-                    // Если email не найден в admins, назначаем роль user
                     updateRoleToUser(email)
+                    saveUserRole("user")
                     navigateToUserMenu()
                 }
             }
@@ -80,11 +83,9 @@ class LoginWindow : AppCompatActivity() {
             }
     }
 
-    // Обновление роли пользователя на 'user' в коллекции users
+    // Обновление роли пользователя на 'user'
     private fun updateRoleToUser(email: String) {
         val userRef = db.collection("users").document(email)
-
-        // Обновление роли пользователя
         userRef.update("role", "user")
             .addOnSuccessListener {
                 Toast.makeText(this, "Роль обновлена на user", Toast.LENGTH_SHORT).show()
@@ -93,11 +94,10 @@ class LoginWindow : AppCompatActivity() {
                 Toast.makeText(this, "Ошибка при обновлении роли: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
-    // Обновление роли пользователя на 'admin' в коллекции users
+
+    // Обновление роли пользователя на 'admin'
     private fun updateRoleToAdmin(email: String) {
         val userRef = db.collection("users").document(email)
-
-        // Обновление роли пользователя
         userRef.update("role", "admin")
             .addOnSuccessListener {
                 Toast.makeText(this, "Роль обновлена до admin", Toast.LENGTH_SHORT).show()
@@ -107,6 +107,12 @@ class LoginWindow : AppCompatActivity() {
             }
     }
 
+    // Сохранение роли пользователя в SharedPreferences
+    private fun saveUserRole(role: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("role", role)
+        editor.apply()
+    }
 
     // Перенаправление на окно администратора
     private fun navigateToAdminMenu() {
