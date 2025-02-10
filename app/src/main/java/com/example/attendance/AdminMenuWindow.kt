@@ -2,6 +2,7 @@ package com.example.attendance
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -13,12 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 
 class AdminMenuWindow : AppCompatActivity() {
-    private lateinit var calendarRecyclerView: RecyclerView
-    private lateinit var subjectsRecyclerView: RecyclerView
-    private lateinit var addSubjectButton: Button
-    private lateinit var openJournalButton: Button
-    private val subjectsAdapter = SubjectsAdapter()
 
+    // Логика выхода из приложения
     private fun logoutUser() {
         val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -33,69 +30,49 @@ class AdminMenuWindow : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_admin_menu_window)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
+        // Установка слушателя на кнопку "Log Out"
         val logoutButton: Button = findViewById(R.id.admin_button_logout)
         logoutButton.setOnClickListener {
             logoutUser()
         }
 
-        calendarRecyclerView = findViewById(R.id.weekCalendar)
-        subjectsRecyclerView = findViewById(R.id.recyclerView)
-        addSubjectButton = findViewById(R.id.btn_add_subject)
-        openJournalButton = findViewById(R.id.btn_open_journal)
-
-        setupCalendar()
-        setupSubjectsRecyclerView()
-
-        addSubjectButton.setOnClickListener {
-            addNewSubject()
-        }
-
-        openJournalButton.setOnClickListener {
-            openJournal()
-        }
-    }
-
-    private fun setupCalendar() {
-        calendarRecyclerView.layoutManager = GridLayoutManager(this, 7) // 7 дней в неделе
+        // Календарь
+        val recyclerViewCalendar: RecyclerView = findViewById(R.id.weekCalendar)
+        recyclerViewCalendar.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val calendarAdapter = CalendarAdapter { selectedDate ->
-            updateSubjectsForDate(selectedDate)
+            // Обработка выбора даты
+            Log.d("Selected Date", selectedDate)
         }
-        calendarRecyclerView.adapter = calendarAdapter
-    }
+        recyclerViewCalendar.adapter = calendarAdapter
 
-    private fun setupSubjectsRecyclerView() {
-        subjectsRecyclerView.layoutManager = LinearLayoutManager(this)
-        subjectsRecyclerView.adapter = subjectsAdapter
-    }
+        // Уроки
+        val recyclerViewSubjects: RecyclerView = findViewById(R.id.recyclerView)
+        recyclerViewSubjects.layoutManager = LinearLayoutManager(this)
+        val subjects = listOf("Математика", "Русский язык", "История")  // Пример списка
+        val subjectAdapter = SubjectAdapter(subjects)
+        recyclerViewSubjects.adapter = subjectAdapter
 
-    private fun updateSubjectsForDate(selectedDate: String) {
-        // Здесь можно подгружать предметы из БД или списка
-        subjectsAdapter.updateSubjects(getSubjectsForDate(selectedDate))
-    }
+        // Кнопка "Добавить предмет"
+        val addSubjectButton: Button = findViewById(R.id.btn_add_subject)
+        addSubjectButton.setOnClickListener {
+            // Логика для добавления предмета
+            // Можно открыть диалог или новое активити
+        }
 
-    private fun addNewSubject() {
-        subjectsAdapter.addSubject("Новый предмет")
-    }
-
-    private fun openJournal() {
-        val intent = Intent(this, JournalActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun getSubjectsForDate(date: String): List<String> {
-        // Здесь можно реализовать логику получения предметов по дате
-        return listOf("Математика", "Физика", "История")
+        // Кнопка "Журнал"
+        val openJournalButton: Button = findViewById(R.id.btn_open_journal)
+        openJournalButton.setOnClickListener {
+            // Логика для перехода в журнал
+            val intent = Intent(this, JournalActivity::class.java) // Переход к журналу
+            startActivity(intent)
+        }
     }
 }
+
 
 

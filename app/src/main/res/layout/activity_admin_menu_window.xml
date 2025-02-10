@@ -15,6 +15,7 @@
         android:layout_gravity="right"
         android:backgroundTint="#383838"
         android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
         android:fontFamily="@font/mulish_medium"
         android:text="Log Out"
         android:textColor="#ffffff"
@@ -27,14 +28,16 @@
         app:layout_constraintVertical_bias="0.489" />
 
     <!-- Календарь с одной неделей -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/weekCalendar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:orientation="horizontal" />
 
     <!-- Контейнер для кнопок в строку -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weekCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:layout_gravity="center"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
