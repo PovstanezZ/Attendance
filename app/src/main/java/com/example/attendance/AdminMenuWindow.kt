@@ -4,29 +4,31 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AdminMenuWindow : AppCompatActivity() {
 
-    // Логика выхода из приложения
+    private lateinit var recyclerViewCalendar: RecyclerView
+    private lateinit var calendarAdapter: CalendarAdapter
+    private lateinit var monthTextView: TextView
+    private val calendar = Calendar.getInstance()
+
     private fun logoutUser() {
         val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.remove("role")  // Удаляем сохраненную роль
+        editor.remove("role")
         editor.apply()
 
-        FirebaseAuth.getInstance().signOut() // Выход из Firebase
+        FirebaseAuth.getInstance().signOut()
 
-        // Переход на стартовое окно
         val intent = Intent(this, StartWindow::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Очистка всех предыдущих активностей
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }
@@ -35,44 +37,43 @@ class AdminMenuWindow : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_menu_window)
 
-        // Установка слушателя на кнопку "Log Out"
         val logoutButton: Button = findViewById(R.id.admin_button_logout)
-        logoutButton.setOnClickListener {
-            logoutUser()
-        }
+        logoutButton.setOnClickListener { logoutUser() }
 
-        // Календарь
-        val recyclerViewCalendar: RecyclerView = findViewById(R.id.weekCalendar)
+        val backWeekButton: Button = findViewById(R.id.back_week)
+        val nextWeekButton: Button = findViewById(R.id.next_week)
+        backWeekButton.text = "<"
+        nextWeekButton.text = ">"
+
+        monthTextView = findViewById(R.id.month)
+        recyclerViewCalendar = findViewById(R.id.weekCalendar)
         recyclerViewCalendar.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        val calendarAdapter = CalendarAdapter { selectedDate ->
-            // Обработка выбора даты
+        calendarAdapter = CalendarAdapter(calendar) { selectedDate ->
             Log.d("Selected Date", selectedDate)
         }
         recyclerViewCalendar.adapter = calendarAdapter
 
-        // Уроки
-        val recyclerViewSubjects: RecyclerView = findViewById(R.id.recyclerView)
-        recyclerViewSubjects.layoutManager = LinearLayoutManager(this)
-        val subjects = listOf("Математика", "Русский язык", "История")  // Пример списка
-        val subjectAdapter = SubjectAdapter(subjects)
-        recyclerViewSubjects.adapter = subjectAdapter
+        updateMonth()
 
-        // Кнопка "Добавить предмет"
-        val addSubjectButton: Button = findViewById(R.id.btn_add_subject)
-        addSubjectButton.setOnClickListener {
-            // Логика для добавления предмета
-            // Можно открыть диалог или новое активити
+        backWeekButton.setOnClickListener {
+            calendar.add(Calendar.WEEK_OF_YEAR, -1)
+            updateCalendar()
         }
 
-        // Кнопка "Журнал"
-        val openJournalButton: Button = findViewById(R.id.btn_open_journal)
-        openJournalButton.setOnClickListener {
-            // Логика для перехода в журнал
-            val intent = Intent(this, JournalActivity::class.java) // Переход к журналу
-            startActivity(intent)
+        nextWeekButton.setOnClickListener {
+            calendar.add(Calendar.WEEK_OF_YEAR, 1)
+            updateCalendar()
         }
     }
+
+    private fun updateCalendar() {
+        calendarAdapter.updateWeek(calendar)
+        updateMonth()
+    }
+
+    private fun updateMonth() {
+        val dateFormat = SimpleDateFormat("LLLL", Locale("ru"))
+        monthTextView.text = dateFormat.format(calendar.time).capitalize()
+    }
 }
-
-
 

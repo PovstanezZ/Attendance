@@ -9,38 +9,32 @@ import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CalendarAdapter(private val onDateSelected: (String) -> Unit) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
+class CalendarAdapter(private var calendar: Calendar, private val onDateSelected: (String) -> Unit) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
 
-    private val currentWeekDates: List<String>
-    private val daysOfWeek: List<String>
-    private var selectedDate: String? = null // Храним выбранную дату
+    private var currentWeekDates: List<String> = getWeekDates()
+    private val daysOfWeek = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
+    private var selectedDate: String? = getTodayDate()
 
-    init {
-        currentWeekDates = getCurrentWeekDates()
-        daysOfWeek = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
-        selectedDate = currentWeekDates.find { it == getTodayDate() } // Устанавливаем текущую дату как выбранную
-    }
-
-    // Получаем сегодняшнюю дату в виде строки
     private fun getTodayDate(): String {
-        val calendar = Calendar.getInstance()
-        return calendar.get(Calendar.DAY_OF_MONTH).toString()
+        val today = Calendar.getInstance()
+        return today.get(Calendar.DAY_OF_MONTH).toString()
     }
 
-    // Получаем список дней текущей недели
-    private fun getCurrentWeekDates(): List<String> {
-        val calendar = Calendar.getInstance()
-        val startOfWeek = calendar.get(Calendar.DAY_OF_WEEK) // Получаем текущий день недели
-
-        // Устанавливаем календарь на начало недели (понедельник)
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        val startOfWeekDate = calendar.get(Calendar.DAY_OF_MONTH)
-
+    private fun getWeekDates(): List<String> {
         val weekDates = mutableListOf<String>()
+        val tempCalendar = calendar.clone() as Calendar
+        tempCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         for (i in 0 until 7) {
-            weekDates.add((startOfWeekDate + i).toString())
+            weekDates.add(tempCalendar.get(Calendar.DAY_OF_MONTH).toString())
+            tempCalendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         return weekDates
+    }
+
+    fun updateWeek(newCalendar: Calendar) {
+        calendar = newCalendar
+        currentWeekDates = getWeekDates()
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarViewHolder {
@@ -51,19 +45,16 @@ class CalendarAdapter(private val onDateSelected: (String) -> Unit) : RecyclerVi
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         val date = currentWeekDates[position]
         holder.bind(date, daysOfWeek[position])
-
-        // Устанавливаем фон в зависимости от того, выбран ли день
         val background = if (date == selectedDate) {
             R.drawable.selected_day_background
         } else {
             R.drawable.default_day_background
         }
         holder.itemView.setBackgroundResource(background)
-
         holder.itemView.setOnClickListener {
-            selectedDate = date // Обновляем выбранную дату
+            selectedDate = date
             onDateSelected(date)
-            notifyDataSetChanged() // Обновляем адаптер для перерисовки
+            notifyDataSetChanged()
         }
     }
 
@@ -75,11 +66,7 @@ class CalendarAdapter(private val onDateSelected: (String) -> Unit) : RecyclerVi
         private val dateText: TextView = itemView.findViewById(R.id.dateText)
 
         fun bind(date: String, dayOfWeek: String) {
-            // Формируем текст с днем недели и числом
             dateText.text = "$dayOfWeek\n$date"
         }
     }
 }
-
-
-
