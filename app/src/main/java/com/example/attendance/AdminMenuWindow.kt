@@ -40,13 +40,13 @@ class AdminMenuWindow : AppCompatActivity() {
         val logoutButton: Button = findViewById(R.id.admin_button_logout)
         logoutButton.setOnClickListener { logoutUser() }
 
-        val backWeekButton: Button = findViewById(R.id.back_week)
-        val nextWeekButton: Button = findViewById(R.id.next_week)
-        backWeekButton.text = "<"
-        nextWeekButton.text = ">"
+        val backWeekButton: Button = findViewById(R.id.admin_back_week)
+        val nextWeekButton: Button = findViewById(R.id.admin_next_week)
+        backWeekButton.text = "<<"
+        nextWeekButton.text = ">>"
 
-        monthTextView = findViewById(R.id.month)
-        recyclerViewCalendar = findViewById(R.id.weekCalendar)
+        monthTextView = findViewById(R.id.admin_month)
+        recyclerViewCalendar = findViewById(R.id.admin_weekCalendar)
         recyclerViewCalendar.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         calendarAdapter = CalendarAdapter(calendar) { selectedDate ->
             Log.d("Selected Date", selectedDate)

@@ -8,66 +8,19 @@
     android:background="#151515"
     android:orientation="vertical"
     tools:context=".LoginWindow">
-
-    <TextView
-        android:id="@+id/LogText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="180sp"
-        android:fontFamily="@font/mulish_semibold"
-        android:text="Меню"
-        android:textColor="#ffffff"
-        android:textSize="24sp" />
-
-
-    <Button
-        android:id="@+id/button_usp"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="#383838"
-        android:fontFamily="@font/mulish_medium"
-        android:text="Успеваемость"
-        android:textColor="#ffffff"
-        android:textSize="18sp"
-        app:cornerRadius="70dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.489" />
-
-    <Button
-        android:id="@+id/button_rasp"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="#383838"
-        android:fontFamily="@font/mulish_medium"
-        android:text="Расписание"
-        android:textColor="#ffffff"
-        android:textSize="18sp"
-        app:cornerRadius="70dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.489" />
-
     <Button
         android:id="@+id/button_logout"
-        android:layout_width="250dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_gravity="right"
         android:backgroundTint="#383838"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:fontFamily="@font/mulish_medium"
-        android:text="Выйти"
+        android:text="Log Out"
         android:textColor="#ffffff"
-        android:textSize="18sp"
+        android:textSize="15sp"
         app:cornerRadius="70dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -75,5 +28,69 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintVertical_bias="0.489" />
 
+    <LinearLayout
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/back_week"
+            android:layout_width="100sp"
+            android:layout_height="48sp"
+            android:layout_gravity="left"
+            android:fontFamily="@font/mulish_medium"
+            android:layout_weight="1"
+            android:textColor="#ffffff"
+            android:textSize="15sp"
+            android:backgroundTint="#383838"
+            android:text=''/>
+
+        <TextView
+            android:id="@+id/month"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:fontFamily="@font/mulish_medium"
+            android:textColor="#ffffff"
+            android:layout_weight="1"
+            android:text="Февраль" />
+
+        <Button
+            android:id="@+id/next_week"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:textColor="#ffffff"
+            android:backgroundTint="#383838"
+            android:textSize="15sp"
+            android:fontFamily="@font/mulish_medium"
+            android:text="" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weekCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="60sp"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:padding="8dp"
+        android:layout_gravity="center"/>
+
+
+
+    <!-- RecyclerView для списка предметов -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/sub_res_view"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="5dp"
+        android:padding="8dp"
+        android:orientation="vertical" />
 
 </LinearLayout>

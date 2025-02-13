@@ -35,19 +35,19 @@
         android:layout_gravity="center">
 
         <Button
-            android:id="@+id/back_week"
+            android:id="@+id/admin_back_week"
             android:layout_width="100sp"
             android:layout_height="48sp"
             android:layout_gravity="left"
             android:fontFamily="@font/mulish_medium"
             android:layout_weight="1"
             android:textColor="#ffffff"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:backgroundTint="#383838"
             android:text=''/>
 
         <TextView
-            android:id="@+id/month"
+            android:id="@+id/admin_month"
             android:layout_width="200sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -59,20 +59,20 @@
             android:text="Февраль" />
 
         <Button
-            android:id="@+id/next_week"
+            android:id="@+id/admin_next_week"
             android:layout_width="100dp"
             android:layout_height="48dp"
             android:layout_gravity="right"
             android:layout_weight="1"
             android:textColor="#ffffff"
             android:backgroundTint="#383838"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:fontFamily="@font/mulish_medium"
             android:text="" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/weekCalendar"
+        android:id="@+id/admin_weekCalendar"
         android:layout_width="wrap_content"
         android:layout_height="60sp"
         android:orientation="horizontal"
@@ -125,7 +125,7 @@
 
     <!-- RecyclerView для списка предметов -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/admin_sub_res_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

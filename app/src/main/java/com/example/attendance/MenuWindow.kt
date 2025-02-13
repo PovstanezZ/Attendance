@@ -2,14 +2,27 @@ package com.example.attendance
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class MenuWindow : AppCompatActivity() {
+
+    private lateinit var recyclerViewCalendar: RecyclerView
+    private lateinit var calendarAdapter: CalendarAdapter
+    private lateinit var monthTextView: TextView
+    private val calendar = Calendar.getInstance()
+
     private fun logoutUser() {
         val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -38,5 +51,38 @@ class MenuWindow : AppCompatActivity() {
         logoutButton.setOnClickListener {
             logoutUser()
         }
+        val backWeekButton: Button = findViewById(R.id.back_week)
+        val nextWeekButton: Button = findViewById(R.id.next_week)
+        backWeekButton.text = "<<"
+        nextWeekButton.text = ">>"
+
+        monthTextView = findViewById(R.id.month)
+        recyclerViewCalendar = findViewById(R.id.weekCalendar)
+        recyclerViewCalendar.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        calendarAdapter = CalendarAdapter(calendar) { selectedDate ->
+            Log.d("Selected Date", selectedDate)
+        }
+        recyclerViewCalendar.adapter = calendarAdapter
+
+        updateMonth()
+
+        backWeekButton.setOnClickListener {
+            calendar.add(Calendar.WEEK_OF_YEAR, -1)
+            updateCalendar()
+        }
+
+        nextWeekButton.setOnClickListener {
+            calendar.add(Calendar.WEEK_OF_YEAR, 1)
+            updateCalendar()
+        }
+    }
+    private fun updateCalendar() {
+        calendarAdapter.updateWeek(calendar)
+        updateMonth()
+    }
+
+    private fun updateMonth() {
+        val dateFormat = SimpleDateFormat("LLLL", Locale("ru"))
+        monthTextView.text = dateFormat.format(calendar.time).capitalize()
     }
 }
