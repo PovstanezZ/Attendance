@@ -1,59 +1,59 @@
 package com.example.attendance
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
-import java.text.SimpleDateFormat
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
 class AdminMenuWindow : AppCompatActivity() {
 
-    private lateinit var recyclerViewCalendar: RecyclerView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var subjectAdapter: SubjectAdapter
     private lateinit var calendarAdapter: CalendarAdapter
-    private lateinit var monthTextView: TextView
+    private var selectedDate: String? = null
+    private val db = FirebaseFirestore.getInstance()
     private val calendar = Calendar.getInstance()
-
-    private fun logoutUser() {
-        val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.remove("role")
-        editor.apply()
-
-        FirebaseAuth.getInstance().signOut()
-
-        val intent = Intent(this, StartWindow::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_menu_window)
 
-        val logoutButton: Button = findViewById(R.id.admin_button_logout)
-        logoutButton.setOnClickListener { logoutUser() }
+        // Инициализация RecyclerView для уроков
+        recyclerView = findViewById(R.id.admin_sub_res_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        subjectAdapter = SubjectAdapter(
+            onDelete = { lessonId -> deleteLesson(lessonId) },
+            onRename = { lessonId, newName -> renameLesson(lessonId, newName) }
+        )
+        recyclerView.adapter = subjectAdapter
 
+        // Инициализация календаря
+        val calendarRecyclerView: RecyclerView = findViewById(R.id.admin_weekCalendar)
+        calendarAdapter = CalendarAdapter(calendar) { date ->
+            selectedDate = date
+            loadLessonsForDate(selectedDate!!)
+        }
+        calendarRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        calendarRecyclerView.adapter = calendarAdapter
+
+        // Установка сегодняшней даты как выбранной
+        selectedDate = getTodayDate()
+
+        // Загрузка уроков для текущей даты
+        loadLessonsForDate(selectedDate!!)
+
+        // Кнопка добавления урока
+        val addLessonButton: Button = findViewById(R.id.admin_btn_add_subject)
+        addLessonButton.setOnClickListener { addLesson() }
+
+        // Обработчики кнопок для смены недели
         val backWeekButton: Button = findViewById(R.id.admin_back_week)
         val nextWeekButton: Button = findViewById(R.id.admin_next_week)
         backWeekButton.text = "<<"
         nextWeekButton.text = ">>"
-
-        monthTextView = findViewById(R.id.admin_month)
-        recyclerViewCalendar = findViewById(R.id.admin_weekCalendar)
-        recyclerViewCalendar.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        calendarAdapter = CalendarAdapter(calendar) { selectedDate ->
-            Log.d("Selected Date", selectedDate)
-        }
-        recyclerViewCalendar.adapter = calendarAdapter
-
-        updateMonth()
 
         backWeekButton.setOnClickListener {
             calendar.add(Calendar.WEEK_OF_YEAR, -1)
@@ -66,14 +66,55 @@ class AdminMenuWindow : AppCompatActivity() {
         }
     }
 
+    private fun getTodayDate(): String {
+        val today = Calendar.getInstance()
+        return today.get(Calendar.DAY_OF_MONTH).toString()
+    }
+
+    private fun loadLessonsForDate(date: String) {
+        db.collection("lessons")
+            .whereEqualTo("date", date)
+            .get()
+            .addOnSuccessListener { result ->
+                val lessons = result.map { doc ->
+                    Lesson(id = doc.id, name = doc.getString("name") ?: "")
+                }
+                subjectAdapter.updateSubjects(lessons)
+            }
+    }
+
+    private fun addLesson() {
+        selectedDate?.let { date ->
+            val lesson = hashMapOf(
+                "name" to "Новый урок",
+                "date" to date
+            )
+            db.collection("lessons")
+                .add(lesson)
+                .addOnSuccessListener {
+                    loadLessonsForDate(date)
+                }
+        }
+    }
+
+    private fun deleteLesson(lessonId: String) {
+        db.collection("lessons").document(lessonId)
+            .delete()
+            .addOnSuccessListener {
+                selectedDate?.let { loadLessonsForDate(it) }
+            }
+    }
+
+    private fun renameLesson(lessonId: String, newName: String) {
+        db.collection("lessons").document(lessonId)
+            .update("name", newName)
+            .addOnSuccessListener {
+                selectedDate?.let { loadLessonsForDate(it) }
+            }
+    }
+
     private fun updateCalendar() {
         calendarAdapter.updateWeek(calendar)
-        updateMonth()
-    }
-
-    private fun updateMonth() {
-        val dateFormat = SimpleDateFormat("LLLL", Locale("ru"))
-        monthTextView.text = dateFormat.format(calendar.time).capitalize()
+        loadLessonsForDate(selectedDate!!)
     }
 }
-
