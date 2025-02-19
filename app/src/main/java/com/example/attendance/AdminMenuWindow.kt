@@ -1,11 +1,16 @@
 package com.example.attendance
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AdminMenuWindow : AppCompatActivity() {
@@ -13,9 +18,11 @@ class AdminMenuWindow : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var subjectAdapter: SubjectAdapter
     private lateinit var calendarAdapter: CalendarAdapter
+    private lateinit var monthTextView: TextView
     private var selectedDate: String? = null
     private val db = FirebaseFirestore.getInstance()
     private val calendar = Calendar.getInstance()
+    private val monthFormat = SimpleDateFormat("LLLL yyyy", Locale("ru"))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +45,20 @@ class AdminMenuWindow : AppCompatActivity() {
         }
         calendarRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         calendarRecyclerView.adapter = calendarAdapter
+
+        // Выйти из аккаунта
+        val logoutButton: ImageButton = findViewById(R.id.admin_button_logout)
+        logoutButton.setOnClickListener {
+            FirebaseAuth.getInstance().signOut() // Выход из аккаунта
+            val intent = Intent(this, LoginWindow::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
+
+        // Текстовое поле для отображения месяца
+        monthTextView = findViewById(R.id.admin_month)
+        updateMonthDisplay()
 
         // Установка сегодняшней даты как выбранной
         selectedDate = getTodayDate()
@@ -115,6 +136,11 @@ class AdminMenuWindow : AppCompatActivity() {
 
     private fun updateCalendar() {
         calendarAdapter.updateWeek(calendar)
+        updateMonthDisplay()  // Обновляем название месяца
         loadLessonsForDate(selectedDate!!)
+    }
+
+    private fun updateMonthDisplay() {
+        monthTextView.text = monthFormat.format(calendar.time).replaceFirstChar { it.uppercaseChar() }
     }
 }

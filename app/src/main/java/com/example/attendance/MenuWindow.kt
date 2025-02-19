@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +23,7 @@ class MenuWindow : AppCompatActivity() {
     private lateinit var calendarAdapter: CalendarAdapter
     private lateinit var monthTextView: TextView
     private val calendar = Calendar.getInstance()
+    private val monthFormat = SimpleDateFormat("LLLL yyyy", Locale("ru"))
 
     private fun logoutUser() {
         val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
@@ -47,7 +49,7 @@ class MenuWindow : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val logoutButton: Button = findViewById(R.id.button_logout)
+        val logoutButton: ImageButton = findViewById(R.id.button_logout)
         logoutButton.setOnClickListener {
             logoutUser()
         }
@@ -70,6 +72,7 @@ class MenuWindow : AppCompatActivity() {
             calendar.add(Calendar.WEEK_OF_YEAR, -1)
             updateCalendar()
         }
+
 
         nextWeekButton.setOnClickListener {
             calendar.add(Calendar.WEEK_OF_YEAR, 1)
