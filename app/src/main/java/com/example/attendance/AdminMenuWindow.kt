@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.attendance.JournalWindow
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -36,6 +37,12 @@ class AdminMenuWindow : AppCompatActivity() {
             onRename = { lessonId, newName -> renameLesson(lessonId, newName) }
         )
         recyclerView.adapter = subjectAdapter
+
+        val journalIntentButton: Button = findViewById(R.id.btn_open_journal)
+        val intentJournalBtn = Intent(this, JournalWindow::class.java)
+        journalIntentButton.setOnClickListener{
+            startActivity(intentJournalBtn)
+        }
 
         // Инициализация календаря
         val calendarRecyclerView: RecyclerView = findViewById(R.id.admin_weekCalendar)

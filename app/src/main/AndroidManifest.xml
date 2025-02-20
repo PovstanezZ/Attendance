@@ -16,12 +16,6 @@
             android:name=".JournalWindow"
             android:exported="false" />
         <activity
-            android:name=".JournalActivity"
-            android:exported="false" />
-        <activity
-            android:name=".WeekAdapter"
-            android:exported="false" />
-        <activity
             android:name=".AdminMenuWindow"
             android:exported="false" />
         <activity

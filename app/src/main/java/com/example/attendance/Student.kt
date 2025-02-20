@@ -1,4 +1,8 @@
 package com.example.attendance
 
-class Student {
-}
+data class Student(
+    var name: String = "",
+    var email: String = "",
+    var group: String = "",
+    var id: String = ""
+)
